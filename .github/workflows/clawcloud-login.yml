@@ -1,12 +1,40 @@
-- name: Install Dependencies
+name: ClawCloud Run Auto Login
+
+on:
+  schedule:
+    # 你的原定计划：每 15 天的 00:00 (UTC 时间) 运行一次
+    - cron: '0 0 */15 * *'
+  # 允许在 GitHub 网页上手动点击运行按钮
+  workflow_dispatch:
+
+jobs:
+  auto-login:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+
+      - name: Install Python Dependencies
         run: |
-          pip install playwright playwright-stealth pyotp requests
+          python -m pip install --upgrade pip
+          # 【更新】加入了 requests 用于推送，去掉了旧代码不需要的包
+          pip install playwright pyotp playwright-stealth requests
           playwright install chromium
+          # 【极其关键】安装 Ubuntu 服务器运行 Chromium 所需的底层依赖
+          playwright install-deps chromium
 
       - name: Run Login Script
-        run: python login_script.py
         env:
           GH_USERNAME: ${{ secrets.GH_USERNAME }}
           GH_PASSWORD: ${{ secrets.GH_PASSWORD }}
           GH_2FA_SECRET: ${{ secrets.GH_2FA_SECRET }}
-          PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}  # 确保在仓库 Secrets 里添加了这个变量
+          # 【新增】填入 PushPlus 的 Token
+          PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
+        # 【精简】直接运行 Python 即可，不再需要 xvfb-run 虚拟桌面包裹
+        run: python -u login_script.py
