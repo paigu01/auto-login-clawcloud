@@ -1,48 +1,12 @@
-# 文件名: .github/workflows/clawcloud-login.yml
-name: ClawCloud Run Auto Login (2FA Support)
-
-on:
-  schedule:
-    - cron: '0 0 */15 * *'
-  workflow_dispatch:
-
-jobs:
-  auto-login:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.9'
-
-      - name: Install System Dependencies
+- name: Install Dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y xvfb
-
-      - name: Install Python Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install playwright pyotp playwright-stealth
+          pip install playwright playwright-stealth pyotp requests
           playwright install chromium
-          # 【极其关键的新增代码】让 Playwright 自动把 Ubuntu 服务器缺失的图形界面底层依赖全装上！
-          playwright install-deps chromium
 
       - name: Run Login Script
+        run: python login_script.py
         env:
           GH_USERNAME: ${{ secrets.GH_USERNAME }}
           GH_PASSWORD: ${{ secrets.GH_PASSWORD }}
           GH_2FA_SECRET: ${{ secrets.GH_2FA_SECRET }}
-        # 带有 -u 参数，确保子进程输出不被屏蔽，实时打印日志
-        run: xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" python -u login_script.py
-
-      - name: Upload Debug Screenshots
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: all-debug-screenshots
-          path: "*.png"
+          PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}  # 确保在仓库 Secrets 里添加了这个变量
