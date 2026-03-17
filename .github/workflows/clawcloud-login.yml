@@ -2,7 +2,6 @@ name: ClawCloud Run Auto Login
 
 on:
   schedule:
-    # 你的原定计划：每 15 天的 00:00 (UTC 时间) 运行一次
     - cron: '35 3 */15 * *'
   # 允许在 GitHub 网页上手动点击运行按钮
   workflow_dispatch:
