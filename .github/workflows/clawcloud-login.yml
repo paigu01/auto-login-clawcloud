@@ -41,5 +41,3 @@ jobs:
           # 【新增】填入 PushPlus 的 Token
           PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
         run: xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" python -u login_script.py
-        
-        run: python -u login_script.py
