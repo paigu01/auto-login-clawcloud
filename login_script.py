@@ -44,9 +44,8 @@ def run_login():
 
     try:
         with sync_playwright() as p:
-            # 既然不需要截图看界面，开启 headless=True 更节省云端资源
             browser = p.chromium.launch(
-                headless=True, 
+                headless=False, 
                 args=["--disable-blink-features=AutomationControlled"]
             )
             context = browser.new_context(viewport={'width': 1920, 'height': 1080})
